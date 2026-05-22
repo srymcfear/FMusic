@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nhạc Của Tôi">
+  <link rel="apple-touch-icon" href="https://emojiisland.com/cdn/shop/products/Green_Music_Note_Emoji_Icon_ios10_large.png?v=1571606036">
   <title>Nhạc Của Tôi</title>
   <style>
     * {
@@ -17,7 +21,7 @@
       background: #121212;
       color: white;
       min-height: 100vh;
-      padding-bottom: 240px;
+      padding-bottom: 260px;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -60,16 +64,6 @@
     .tab.liked-tab .tab-text {
       display: none;
     }
-    .tab.liked-tab .tab-icon {
-      font-size: 18px;
-    }
-
-    .tab-icon {
-      font-size: 15px;
-    }
-    .tab-text {
-      font-size: 14px;
-    }
 
     .icon-btn {
       background: #282828;
@@ -80,7 +74,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
       font-size: 18px;
       transition: all 0.2s ease;
     }
@@ -222,10 +215,9 @@
       border-radius: 8px;
       margin-right: 14px;
       object-fit: cover;
-      background: #282828;
     }
 
-    /* ============ PLAYER BAR STYLES ============ */
+    /* Player Bar */
     .player-bar {
       position: fixed;
       bottom: 0;
@@ -233,9 +225,8 @@
       right: 0;
       background: rgba(18, 18, 18, 0.98);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 16px 20px 24px;
+      padding: 14px 20px 22px;
       z-index: 1000;
     }
 
@@ -243,16 +234,15 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       cursor: pointer;
     }
 
     .player-cover {
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border-radius: 12px;
       object-fit: cover;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .player-info {
@@ -262,28 +252,27 @@
 
     .player-title {
       font-weight: 700;
-      font-size: 16px;
+      font-size: 15px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 4px;
     }
 
     .player-artist {
       color: #b3b3b3;
-      font-size: 13px;
+      font-size: 12px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-top: 2px;
     }
 
     .progress-mini {
       height: 3px;
       background: #404040;
       border-radius: 999px;
-      margin-top: 10px;
+      margin-top: 8px;
       cursor: pointer;
-      position: relative;
     }
 
     .progress-mini-fill {
@@ -291,51 +280,68 @@
       background: #1ed760;
       border-radius: 999px;
       width: 0%;
-      transition: width 0.1s linear;
     }
 
     .player-controls {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 32px;
-      margin: 16px 0 20px;
+      gap: 24px;
+      margin: 14px 0 16px;
     }
 
     .ctrl-btn {
       background: none;
       border: none;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
+      font-size: 28px;
+      color: white;
+      opacity: 0.8;
+      transition: all 0.1s ease;
     }
 
     .ctrl-btn:active {
       transform: scale(0.92);
     }
 
-    .ctrl-btn.prev, .ctrl-btn.next {
-      font-size: 32px;
-      color: white;
-      opacity: 0.8;
-    }
-
     .ctrl-btn.play {
-      width: 60px;
-      height: 60px;
+      width: 56px;
+      height: 56px;
       background: #1ed760;
       border-radius: 50%;
-      font-size: 30px;
+      font-size: 28px;
       color: black;
-      box-shadow: 0 4px 15px rgba(30, 215, 96, 0.4);
+      opacity: 1;
+      box-shadow: 0 4px 12px rgba(30, 215, 96, 0.3);
     }
 
-    /* Volume section - full width */
+    .mode-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.1s ease;
+      padding: 4px 8px;
+      border-radius: 20px;
+    }
+
+    .mode-btn.active {
+      opacity: 1;
+      color: #1ed760;
+      background: rgba(30, 215, 96, 0.15);
+    }
+
     .volume-section {
       width: 100%;
-      padding-top: 12px;
+      padding-top: 10px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -343,87 +349,76 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      width: 100%;
     }
 
     .volume-icon {
-      font-size: 18px;
+      font-size: 16px;
       color: #1ed760;
-      min-width: 32px;
       cursor: pointer;
     }
 
     .volume-slider {
       flex: 1;
-      height: 5px;
+      height: 4px;
       -webkit-appearance: none;
       background: #404040;
       border-radius: 999px;
-      outline: none;
     }
 
     .volume-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       background: #1ed760;
       border-radius: 50%;
       cursor: pointer;
-      box-shadow: 0 0 8px #1ed760;
     }
 
     .volume-value {
-      font-size: 13px;
+      font-size: 12px;
       color: #b3b3b3;
-      min-width: 45px;
+      min-width: 40px;
       text-align: right;
-      font-weight: 500;
     }
 
     .empty-state {
       text-align: center;
       padding: 50px 20px;
       color: #888;
-      font-size: 15px;
     }
 
     .section-title {
       margin: 16px 0 8px;
       font-size: 17px;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .song-item input[type="checkbox"] {
       width: 22px;
       height: 22px;
       margin-right: 12px;
-      cursor: pointer;
       accent-color: #1ed760;
     }
 
     .toast {
       position: fixed;
-      bottom: 260px;
+      bottom: 280px;
       left: 20px;
       right: 20px;
       background: #1ed760;
       color: black;
-      padding: 12px 16px;
+      padding: 12px;
       border-radius: 30px;
       text-align: center;
       font-weight: 600;
       z-index: 2000;
-      animation: fadeOut 2.5s ease forwards;
-      font-size: 14px;
+      animation: fadeOut 2s ease forwards;
     }
 
     @keyframes fadeOut {
-      0% { opacity: 1; bottom: 260px; }
+      0% { opacity: 1; }
       70% { opacity: 1; }
-      100% { opacity: 0; bottom: 240px; visibility: hidden; }
+      100% { opacity: 0; visibility: hidden; }
     }
 
     @media (max-width: 480px) {
@@ -431,31 +426,13 @@
         max-width: 260px;
         height: 260px;
       }
-      .title {
-        font-size: 19px;
-      }
-      .tab {
-        padding: 6px 12px;
-      }
       .ctrl-btn.prev, .ctrl-btn.next {
-        font-size: 28px;
+        font-size: 24px;
       }
       .ctrl-btn.play {
-        width: 54px;
-        height: 54px;
-        font-size: 26px;
-      }
-      .player-cover {
         width: 50px;
         height: 50px;
-      }
-      .volume-icon {
-        font-size: 16px;
-        min-width: 28px;
-      }
-      .volume-value {
-        font-size: 12px;
-        min-width: 40px;
+        font-size: 24px;
       }
     }
   </style>
@@ -463,13 +440,13 @@
 <body>
   <div class="tabs-container" id="tabsContainer">
     <div id="tabs" style="display:flex; gap:8px; flex:1; overflow-x:auto;"></div>
-    <button class="icon-btn select-btn" onclick="toggleSelectAll()" title="Chọn tất cả">✅</button>
-    <button class="icon-btn add-btn" onclick="addSongs()" title="Thêm nhạc">➕</button>
+    <button class="icon-btn select-btn" onclick="toggleSelectAll()">✅</button>
+    <button class="icon-btn add-btn" onclick="addSongs()">➕</button>
   </div>
 
   <div class="control-bar">
     <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Tìm kiếm..." onkeyup="filterSongs()">
-    <button id="deleteSelectedBtn" class="icon-btn delete-btn" style="display:none;" onclick="deleteSelected()" title="Xóa">🗑</button>
+    <button id="deleteSelectedBtn" class="icon-btn delete-btn" style="display:none;" onclick="deleteSelected()">🗑</button>
   </div>
 
   <div class="container">
@@ -490,10 +467,10 @@
     <div id="playlistContainer"></div>
   </div>
 
-  <!-- PLAYER BAR -->
+  <!-- Player Bar -->
   <div class="player-bar">
     <div class="player-main-row" onclick="scrollToTop()">
-      <img id="barCover" class="player-cover" src="https://picsum.photos/id/870/300/300" alt="cover">
+      <img id="barCover" class="player-cover" src="https://picsum.photos/id/870/100/100">
       <div class="player-info">
         <div id="barTitle" class="player-title">Chưa phát nhạc</div>
         <div id="barArtist" class="player-artist"></div>
@@ -503,15 +480,20 @@
       </div>
     </div>
 
+    <div class="mode-buttons" onclick="event.stopPropagation()">
+      <button class="mode-btn" id="shuffleBtn" onclick="toggleShuffle()" title="Phát ngẫu nhiên">🔀</button>
+      <button class="mode-btn" id="repeatBtn" onclick="toggleRepeat()" title="Lặp lại">🔁</button>
+    </div>
+
     <div class="player-controls" onclick="event.stopPropagation()">
-      <button class="ctrl-btn prev" onclick="prevSong()" title="Bài trước">⏮</button>
+      <button class="ctrl-btn" onclick="prevSong()">⏮</button>
       <button class="ctrl-btn play" id="playBtnBar" onclick="togglePlay()">▶</button>
-      <button class="ctrl-btn next" onclick="nextSong()" title="Bài sau">⏭</button>
+      <button class="ctrl-btn" onclick="nextSong()">⏭</button>
     </div>
 
     <div class="volume-section" onclick="event.stopPropagation()">
       <div class="volume-row">
-        <span class="volume-icon" id="volumeIcon" onclick="toggleMute()" title="Bật/tắt tiếng">🔊</span>
+        <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
         <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
         <span id="volumePercent" class="volume-value">70%</span>
       </div>
@@ -522,6 +504,7 @@
   <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple style="display:none;">
 
   <script>
+    // ==================== CONFIG ====================
     let db;
     let playlists = {};
     let currentPlaylistName = "❤️";
@@ -531,7 +514,14 @@
     let currentSearchQuery = "";
     let currentSongId = null;
     let currentBlobUrl = null;
+    
+    // New features
+    let shuffleMode = false;
+    let repeatMode = false; // false: normal, true: repeat all
+    let shuffledIndices = [];
+    let originalIndices = [];
 
+    // DOM elements
     const audio = document.getElementById('audio');
     const fileInput = document.getElementById('fileInput');
     const albumArtDiv = document.getElementById('albumArt');
@@ -545,83 +535,171 @@
     const progressMiniFill = document.getElementById('progressMiniFill');
     const currentTimeSpan = document.getElementById('currentTime');
     const durationSpan = document.getElementById('duration');
-    
     const volumeSlider = document.getElementById('volumeSlider');
     const volumePercent = document.getElementById('volumePercent');
     const volumeIcon = document.getElementById('volumeIcon');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
 
-    // Store last volume before mute
+    // Volume
     let lastVolume = 70;
-
-    // Set initial volume
     audio.volume = 0.7;
 
-    // Update volume icon based on level
     function updateVolumeIcon(value) {
-      const val = parseInt(value);
-      if (val == 0) {
-        volumeIcon.textContent = '🔇';
-      } else if (val < 30) {
-        volumeIcon.textContent = '🔈';
-      } else if (val < 70) {
-        volumeIcon.textContent = '🔉';
-      } else {
-        volumeIcon.textContent = '🔊';
-      }
+      const v = parseInt(value);
+      if (v == 0) volumeIcon.textContent = '🔇';
+      else if (v < 30) volumeIcon.textContent = '🔈';
+      else if (v < 70) volumeIcon.textContent = '🔉';
+      else volumeIcon.textContent = '🔊';
     }
 
-    // Handle volume change from slider
     function handleVolumeChange() {
-      const value = parseInt(volumeSlider.value);
-      audio.volume = value / 100;
-      volumePercent.textContent = value + '%';
-      updateVolumeIcon(value);
-      if (value > 0) {
-        lastVolume = value;
-      }
+      const val = volumeSlider.value;
+      audio.volume = val / 100;
+      volumePercent.textContent = val + '%';
+      updateVolumeIcon(val);
+      if (val > 0) lastVolume = val;
     }
 
-    // Toggle mute function
     function toggleMute() {
-      const currentValue = parseInt(volumeSlider.value);
-      if (currentValue > 0) {
-        // Mute: save current volume and set to 0
-        lastVolume = currentValue;
+      if (volumeSlider.value > 0) {
+        lastVolume = volumeSlider.value;
         volumeSlider.value = 0;
-        handleVolumeChange();
       } else {
-        // Unmute: restore last volume
         volumeSlider.value = lastVolume;
-        handleVolumeChange();
       }
+      handleVolumeChange();
     }
 
     volumeSlider.addEventListener('input', handleVolumeChange);
     handleVolumeChange();
 
-    // Show toast notification
-    function showToast(message, isError = false) {
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = message;
-      toast.style.background = isError ? '#e74c3c' : '#1ed760';
-      toast.style.color = isError ? 'white' : 'black';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+    // Shuffle functions
+    function updateShuffleIndices() {
+      const songs = playlists[currentPlaylistName] || [];
+      const count = songs.length;
+      if (!shuffleMode || count === 0) {
+        shuffledIndices = [];
+        return;
+      }
+      // Create array of indices 0..count-1
+      let indices = Array.from({ length: count }, (_, i) => i);
+      // Fisher-Yates shuffle
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      shuffledIndices = indices;
+      // Find current index position in shuffled array
+      const currentPos = shuffledIndices.findIndex(i => i === currentIndex);
+      if (currentPos !== -1) {
+        originalIndices = shuffledIndices;
+      }
     }
 
-    function formatTime(seconds) {
-      if (isNaN(seconds)) return "0:00";
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    function toggleShuffle() {
+      shuffleMode = !shuffleMode;
+      if (shuffleMode) {
+        updateShuffleIndices();
+        shuffleBtn.classList.add('active');
+      } else {
+        shuffleBtn.classList.remove('active');
+        shuffledIndices = [];
+      }
+      showToast(shuffleMode ? "🔀 Phát ngẫu nhiên" : "➡️ Phát tuần tự");
+    }
+
+    function toggleRepeat() {
+      repeatMode = !repeatMode;
+      if (repeatMode) {
+        repeatBtn.classList.add('active');
+        showToast("🔁 Lặp lại danh sách");
+      } else {
+        repeatBtn.classList.remove('active');
+        showToast("➡️ Phát một lần");
+      }
+    }
+
+    function getNextIndex() {
+      const songs = playlists[currentPlaylistName];
+      if (!songs || songs.length === 0) return -1;
+      
+      if (shuffleMode && shuffledIndices.length > 0) {
+        const currentPos = shuffledIndices.findIndex(i => i === currentIndex);
+        let nextPos = currentPos + 1;
+        if (nextPos >= shuffledIndices.length) {
+          if (repeatMode) {
+            updateShuffleIndices();
+            nextPos = 0;
+          } else {
+            return -1;
+          }
+        }
+        return shuffledIndices[nextPos];
+      } else {
+        let nextIdx = currentIndex + 1;
+        if (nextIdx >= songs.length) {
+          if (repeatMode) {
+            nextIdx = 0;
+          } else {
+            return -1;
+          }
+        }
+        return nextIdx;
+      }
+    }
+
+    function getPrevIndex() {
+      const songs = playlists[currentPlaylistName];
+      if (!songs || songs.length === 0) return -1;
+      
+      if (shuffleMode && shuffledIndices.length > 0) {
+        const currentPos = shuffledIndices.findIndex(i => i === currentIndex);
+        let prevPos = currentPos - 1;
+        if (prevPos < 0) {
+          if (repeatMode) {
+            updateShuffleIndices();
+            prevPos = shuffledIndices.length - 1;
+          } else {
+            return -1;
+          }
+        }
+        return shuffledIndices[prevPos];
+      } else {
+        let prevIdx = currentIndex - 1;
+        if (prevIdx < 0) {
+          if (repeatMode) {
+            prevIdx = songs.length - 1;
+          } else {
+            return -1;
+          }
+        }
+        return prevIdx;
+      }
+    }
+
+    function showToast(msg, isErr = false) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      toast.style.background = isErr ? '#e74c3c' : '#1ed760';
+      toast.style.color = isErr ? 'white' : 'black';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
     function updateProgress() {
       if (!audio.duration) return;
-      const percent = (audio.currentTime / audio.duration) * 100;
-      progressFill.style.width = percent + '%';
-      if (progressMiniFill) progressMiniFill.style.width = percent + '%';
+      const p = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = p + '%';
+      if (progressMiniFill) progressMiniFill.style.width = p + '%';
       currentTimeSpan.textContent = formatTime(audio.currentTime);
       durationSpan.textContent = formatTime(audio.duration);
     }
@@ -634,20 +712,25 @@
     document.getElementById('progressContainer').addEventListener('click', (e) => {
       if (!audio.duration) return;
       const rect = e.currentTarget.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     });
 
     document.getElementById('progressMiniContainer').addEventListener('click', (e) => {
       if (!audio.duration) return;
       e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     });
 
-    audio.addEventListener('ended', () => nextSong());
-    
+    audio.addEventListener('ended', () => {
+      const next = getNextIndex();
+      if (next !== -1) {
+        playSong(currentPlaylistName, next);
+      } else {
+        audio.pause();
+      }
+    });
+
     audio.addEventListener('play', () => {
       isPlaying = true;
       playBtnBar.innerHTML = '⏸';
@@ -660,126 +743,88 @@
       albumArtDiv.classList.remove('rotating');
     });
 
+    // IndexedDB
     function initDB() {
       return new Promise((resolve) => {
-        const request = indexedDB.open("MusicPlayerDB", 5);
-        request.onupgradeneeded = (e) => {
+        const req = indexedDB.open("MusicPlayerDB", 5);
+        req.onupgradeneeded = (e) => {
           db = e.target.result;
           if (!db.objectStoreNames.contains("songFiles")) {
             db.createObjectStore("songFiles", { keyPath: "id" });
           }
         };
-        request.onsuccess = (e) => {
-          db = e.target.result;
-          resolve();
-        };
-        request.onerror = () => {
-          console.log("DB error");
-          resolve();
-        };
+        req.onsuccess = (e) => { db = e.target.result; resolve(); };
+        req.onerror = () => resolve();
       });
     }
 
-    async function saveSongFile(id, file, metadata) {
-      return new Promise((resolve, reject) => {
+    async function saveSongFile(id, file, meta) {
+      return new Promise((resolve) => {
         const tx = db.transaction("songFiles", "readwrite");
-        const store = tx.objectStore("songFiles");
-        store.put({ id, blob: file, ...metadata });
-        tx.oncomplete = () => resolve();
-        tx.onerror = (err) => reject(err);
+        tx.objectStore("songFiles").put({ id, blob: file, ...meta });
+        tx.oncomplete = resolve;
       });
     }
 
     async function getSongFile(id) {
       return new Promise((resolve) => {
         if (!db) { resolve(null); return; }
-        const tx = db.transaction("songFiles", "readonly");
-        const store = tx.objectStore("songFiles");
-        const request = store.get(id);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => resolve(null);
+        const req = db.transaction("songFiles").objectStore("songFiles").get(id);
+        req.onsuccess = () => resolve(req.result);
       });
     }
 
     function loadPlaylists() {
-      const saved = localStorage.getItem('playlists_v4');
-      if (saved) {
-        playlists = JSON.parse(saved);
-      } else {
-        playlists = { "❤️": [] };
-      }
+      const saved = localStorage.getItem('playlists_v5');
+      if (saved) playlists = JSON.parse(saved);
+      else playlists = { "❤️": [] };
       if (!playlists["❤️"]) playlists["❤️"] = [];
       currentPlaylistName = "❤️";
     }
 
     function savePlaylists() {
-      localStorage.setItem('playlists_v4', JSON.stringify(playlists));
+      localStorage.setItem('playlists_v5', JSON.stringify(playlists));
     }
 
     async function addSongToPlaylist(file) {
-      if (!file.name.toLowerCase().endsWith('.mp3')) {
+      if (!file.name.endsWith('.mp3')) {
         showToast(`⚠️ ${file.name} không phải MP3`, true);
         return false;
       }
-
       const id = 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-      const title = file.name.replace(/\.mp3$/i, "").replace(/\.mpeg$/i, "");
-      
-      try {
-        await saveSongFile(id, file, { title, artist: "Local", cover: "https://picsum.photos/id/870/400/400", dateAdded: Date.now() });
-        
-        playlists[currentPlaylistName].push({
-          id, title, artist: "Local", cover: "https://picsum.photos/id/870/400/400", dateAdded: Date.now()
-        });
-        savePlaylists();
-        return true;
-      } catch (err) {
-        console.error(err);
-        return false;
-      }
+      const title = file.name.replace(/\.mp3$/i, "");
+      await saveSongFile(id, file, { title, artist: "Local", cover: "https://picsum.photos/id/870/400/400" });
+      playlists[currentPlaylistName].push({ id, title, artist: "Local", cover: "https://picsum.photos/id/870/400/400" });
+      savePlaylists();
+      return true;
     }
 
-    async function addSongs() {
-      fileInput.click();
-    }
+    async function addSongs() { fileInput.click(); }
 
     fileInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       if (!files.length) return;
-      
-      showToast(`📀 Đang thêm ${files.length} bài...`);
+      showToast(`📀 Đang thêm...`);
       let added = 0;
-      for (let file of files) {
-        if (await addSongToPlaylist(file)) added++;
-      }
-      
-      if (added > 0) {
-        renderPlaylist();
-        renderTabs();
-        showToast(`✅ Đã thêm ${added} bài`);
-      } else {
-        showToast(`❌ Không thể thêm file`, true);
-      }
+      for (let f of files) if (await addSongToPlaylist(f)) added++;
+      if (added) { renderPlaylist(); renderTabs(); showToast(`✅ Đã thêm ${added} bài`); }
+      else showToast(`❌ Thêm thất bại`, true);
       fileInput.value = '';
     });
 
     async function playSong(playlistName, index) {
       const playlist = playlists[playlistName];
       if (!playlist || index >= playlist.length) return;
-      
       currentPlaylistName = playlistName;
       currentIndex = index;
       const song = playlist[currentIndex];
       currentSongId = song.id;
       
-      const fileData = await getSongFile(song.id);
-      if (!fileData || !fileData.blob) {
-        showToast(`❌ Không tìm thấy file: ${song.title}`, true);
-        return;
-      }
+      const data = await getSongFile(song.id);
+      if (!data?.blob) { showToast(`❌ Không tìm thấy file`, true); return; }
       
       if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-      currentBlobUrl = URL.createObjectURL(fileData.blob);
+      currentBlobUrl = URL.createObjectURL(data.blob);
       audio.src = currentBlobUrl;
       audio.load();
       
@@ -790,120 +835,53 @@
       barArtist.textContent = song.artist;
       barCover.src = song.cover;
       
-      if ('mediaSession' in navigator) {
+      if (navigator.mediaSession) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: song.title, artist: song.artist,
           artwork: [{ src: song.cover, sizes: '512x512' }]
         });
       }
       
-      try { await audio.play(); } catch(e) { console.log(e); }
+      try { await audio.play(); } catch(e) {}
       renderPlaylist();
       renderTabs();
     }
 
     async function togglePlay() {
-      if (!audio.src || audio.src === "") {
-        const songs = playlists[currentPlaylistName];
-        if (songs?.length) playSong(currentPlaylistName, 0);
+      if (!audio.src) {
+        const s = playlists[currentPlaylistName];
+        if (s?.length) playSong(currentPlaylistName, 0);
         return;
       }
-      
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        try {
-          await audio.play();
-        } catch (err) {
-          if (currentSongId) {
-            const fileData = await getSongFile(currentSongId);
-            if (fileData?.blob) {
-              if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-              currentBlobUrl = URL.createObjectURL(fileData.blob);
-              const savedTime = audio.currentTime;
-              audio.src = currentBlobUrl;
-              audio.load();
-              audio.currentTime = savedTime;
-              setTimeout(() => audio.play().catch(e => console.log(e)), 100);
-            }
-          }
-        }
-      }
+      isPlaying ? audio.pause() : await audio.play();
     }
 
     function nextSong() {
-      const songs = playlists[currentPlaylistName];
-      if (!songs?.length) return;
-      let nextIdx = currentIndex + 1;
-      if (nextIdx >= songs.length) nextIdx = 0;
-      playSong(currentPlaylistName, nextIdx);
+      const next = getNextIndex();
+      if (next !== -1) playSong(currentPlaylistName, next);
     }
 
     function prevSong() {
-      const songs = playlists[currentPlaylistName];
-      if (!songs?.length) return;
-      let prevIdx = currentIndex - 1;
-      if (prevIdx < 0) prevIdx = songs.length - 1;
-      playSong(currentPlaylistName, prevIdx);
+      const prev = getPrevIndex();
+      if (prev !== -1) playSong(currentPlaylistName, prev);
     }
 
+    // Render
     function renderTabs() {
-      const tabsContainer = document.getElementById('tabs');
-      if (!tabsContainer) return;
-      
-      const html = Object.keys(playlists).map(name => {
-        const isLiked = (name === "❤️");
-        if (isLiked) {
-          return `
-            <div class="tab liked-tab ${name === currentPlaylistName ? 'active' : ''}" onclick="switchPlaylist('${name.replace(/'/g, "\\'")}')">
-              <span class="tab-icon">❤️</span>
-              <span class="tab-text" style="display:none;"></span>
-            </div>
-          `;
-        } else {
-          let icon = "📁";
-          let displayName = name;
-          const iconMatch = name.match(/^([\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]+)/u);
-          if (iconMatch) {
-            icon = iconMatch[1];
-            displayName = name.replace(icon, "").trim();
-          }
-          return `
-            <div class="tab ${name === currentPlaylistName ? 'active' : ''}" onclick="switchPlaylist('${name.replace(/'/g, "\\'")}')">
-              <span class="tab-icon">${icon}</span>
-              <span class="tab-text">${displayName}</span>
-            </div>
-          `;
-        }
+      const cont = document.getElementById('tabs');
+      if (!cont) return;
+      cont.innerHTML = Object.keys(playlists).map(name => {
+        const isLiked = name === "❤️";
+        if (isLiked) return `<div class="tab liked-tab ${name === currentPlaylistName ? 'active' : ''}" onclick="switchPlaylist('❤️')"><span class="tab-icon">❤️</span></div>`;
+        return `<div class="tab ${name === currentPlaylistName ? 'active' : ''}" onclick="switchPlaylist('${name.replace(/'/g, "\\'")}')"><span>${name}</span></div>`;
       }).join('');
-      tabsContainer.innerHTML = html;
-      
-      if (!document.getElementById('createPlaylistBtn')) {
-        const btn = document.createElement('button');
-        btn.id = 'createPlaylistBtn';
-        btn.className = 'icon-btn select-btn';
-        btn.innerHTML = '📁+';
-        btn.title = "Tạo playlist mới";
-        btn.style.fontSize = '18px';
-        btn.onclick = () => createNewPlaylist();
-        document.getElementById('tabsContainer')?.appendChild(btn);
-      }
-    }
-
-    function createNewPlaylist() {
-      const name = prompt("Tên playlist mới (có thể thêm icon như 🎵, 🎧, 🔥):");
-      if (!name?.trim()) return;
-      if (playlists[name]) { showToast("Đã tồn tại!", true); return; }
-      playlists[name] = [];
-      savePlaylists();
-      renderTabs();
-      switchPlaylist(name);
-      showToast(`✅ Đã tạo "${name}"`);
     }
 
     function switchPlaylist(name) {
       currentPlaylistName = name;
       selectedSongs.clear();
+      currentIndex = 0;
+      if (shuffleMode) updateShuffleIndices();
       renderTabs();
       renderPlaylist();
     }
@@ -914,110 +892,67 @@
     }
 
     function renderPlaylist() {
-      const container = document.getElementById('playlistContainer');
+      const cont = document.getElementById('playlistContainer');
       let songs = playlists[currentPlaylistName] || [];
+      if (currentSearchQuery) songs = songs.filter(s => s.title.toLowerCase().includes(currentSearchQuery));
       
-      if (currentSearchQuery.trim()) {
-        songs = songs.filter(s => s.title.toLowerCase().includes(currentSearchQuery) || s.artist.toLowerCase().includes(currentSearchQuery));
-      }
-      
-      if (songs.length === 0) {
-        let emptyMessage = currentPlaylistName === "❤️" 
-          ? "🎵 Chưa có bài hát nào\n\n❤️ Nhấn nút + để thêm nhạc MP3"
-          : "🎵 Playlist trống\n\nNhấn + để thêm nhạc";
-        container.innerHTML = `<div class="empty-state">${emptyMessage.replace(/\n/g, '<br>')}</div>`;
+      if (!songs.length) {
+        cont.innerHTML = `<div class="empty-state">🎵 Chưa có bài hát nào<br>❤️ Nhấn nút + để thêm MP3</div>`;
       } else {
-        let headerIcon = currentPlaylistName === "❤️" ? "❤️" : "🎵";
-        let headerText = currentPlaylistName === "❤️" ? "Yêu thích" : currentPlaylistName.replace(/^[^\w]+/, "");
-        let html = `<div class="section-title"><span>${headerIcon}</span> <span>${headerText} (${songs.length})</span></div>`;
-        html += songs.map((song, idx) => {
-          const isCurrent = (currentSongId === song.id);
-          return `
-            <div class="song-item ${isCurrent ? 'playing' : ''}" onclick="playSongByIndex(${idx})">
-              <input type="checkbox" ${selectedSongs.has(song.id) ? 'checked' : ''} 
-                     onclick="event.stopPropagation(); toggleSelect('${song.id}')">
-              <img src="${song.cover}" onerror="this.src='https://picsum.photos/id/870/100/100'">
-              <div style="flex:1">
-                <div style="font-weight:600;">${escapeHtml(song.title)}</div>
-                <div style="color:#b3b3b3; font-size:13px;">${escapeHtml(song.artist)}</div>
-              </div>
-              ${isCurrent && isPlaying ? '<span style="color:#1ed760;">🔊</span>' : ''}
-            </div>
-          `;
-        }).join('');
-        container.innerHTML = html;
+        let html = `<div class="section-title">📀 ${currentPlaylistName === "❤️" ? "Yêu thích" : currentPlaylistName} (${songs.length})</div>`;
+        html += songs.map((s, i) => `<div class="song-item ${currentSongId === s.id ? 'playing' : ''}" onclick="playSongByIndex(${i})">
+          <input type="checkbox" ${selectedSongs.has(s.id) ? 'checked' : ''} onclick="event.stopPropagation(); toggleSelect('${s.id}')">
+          <img src="${s.cover}" onerror="this.src='https://picsum.photos/id/870/100/100'">
+          <div style="flex:1"><div style="font-weight:600;">${escapeHtml(s.title)}</div><div style="color:#b3b3b3;font-size:13px;">${escapeHtml(s.artist)}</div></div>
+          ${currentSongId === s.id && isPlaying ? '<span style="color:#1ed760;">🔊</span>' : ''}
+        </div>`).join('');
+        cont.innerHTML = html;
       }
-      
-      const deleteBtn = document.getElementById('deleteSelectedBtn');
-      if (deleteBtn) deleteBtn.style.display = selectedSongs.size > 0 ? 'flex' : 'none';
+      const delBtn = document.getElementById('deleteSelectedBtn');
+      if (delBtn) delBtn.style.display = selectedSongs.size ? 'flex' : 'none';
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
-    window.playSongByIndex = function(filteredIndex) {
+    window.playSongByIndex = function(idx) {
       let songs = playlists[currentPlaylistName] || [];
-      if (currentSearchQuery.trim()) {
-        const filtered = songs.filter(s => s.title.toLowerCase().includes(currentSearchQuery) || s.artist.toLowerCase().includes(currentSearchQuery));
-        if (filteredIndex >= 0 && filteredIndex < filtered.length) {
-          const originalIndex = songs.findIndex(s => s.id === filtered[filteredIndex].id);
-          if (originalIndex !== -1) playSong(currentPlaylistName, originalIndex);
+      if (currentSearchQuery) {
+        const filtered = songs.filter(s => s.title.toLowerCase().includes(currentSearchQuery));
+        if (idx < filtered.length) {
+          const origIdx = songs.findIndex(s => s.id === filtered[idx].id);
+          if (origIdx !== -1) playSong(currentPlaylistName, origIdx);
         }
-      } else {
-        playSong(currentPlaylistName, filteredIndex);
-      }
+      } else { playSong(currentPlaylistName, idx); }
     };
 
-    window.toggleSelect = function(songId) {
-      selectedSongs.has(songId) ? selectedSongs.delete(songId) : selectedSongs.add(songId);
+    window.toggleSelect = function(id) {
+      selectedSongs.has(id) ? selectedSongs.delete(id) : selectedSongs.add(id);
       renderPlaylist();
     };
 
     window.toggleSelectAll = function() {
       const songs = playlists[currentPlaylistName] || [];
-      if (selectedSongs.size === songs.length && songs.length > 0) {
-        selectedSongs.clear();
-      } else {
-        songs.forEach(s => selectedSongs.add(s.id));
-      }
+      if (selectedSongs.size === songs.length) selectedSongs.clear();
+      else songs.forEach(s => selectedSongs.add(s.id));
       renderPlaylist();
     };
 
     window.deleteSelected = function() {
-      if (selectedSongs.size === 0) return;
-      if (!confirm(`Xóa ${selectedSongs.size} bài hát?`)) return;
-      
+      if (!selectedSongs.size) return;
+      if (!confirm(`Xóa ${selectedSongs.size} bài?`)) return;
       playlists[currentPlaylistName] = playlists[currentPlaylistName].filter(s => !selectedSongs.has(s.id));
-      
       if (selectedSongs.has(currentSongId)) {
-        if (playlists[currentPlaylistName].length > 0) {
-          playSong(currentPlaylistName, 0);
-        } else {
-          audio.pause();
-          audio.src = '';
-          currentSongId = null;
-          titleEl.textContent = "Chọn bài hát";
-          artistEl.textContent = "";
-          albumArtDiv.style.backgroundImage = "url('https://picsum.photos/id/870/400/400')";
-          barTitle.textContent = "Chưa phát nhạc";
-          barArtist.textContent = "";
-          playBtnBar.innerHTML = '▶';
-          albumArtDiv.classList.remove('rotating');
-        }
+        if (playlists[currentPlaylistName].length) playSong(currentPlaylistName, 0);
+        else { audio.pause(); audio.src = ''; titleEl.textContent = "Chọn bài hát"; barTitle.textContent = "Chưa phát nhạc"; playBtnBar.innerHTML = '▶'; }
       }
-      
       selectedSongs.clear();
       savePlaylists();
       renderPlaylist();
     };
 
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    if ('mediaSession' in navigator) {
+    if (navigator.mediaSession) {
       navigator.mediaSession.setActionHandler('play', () => togglePlay());
       navigator.mediaSession.setActionHandler('pause', () => audio.pause());
       navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
@@ -1031,7 +966,6 @@
       renderPlaylist();
       showToast("🎵 Nhấn + để thêm nhạc MP3");
     }
-    
     init();
   </script>
 </body>
