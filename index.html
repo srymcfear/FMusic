@@ -2,20 +2,25 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nhạc Của Tôi">
+  <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/srymcfear/verify_me/refs/heads/main/assets/icon/fear_logo.ico">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/srymcfear/verify_me/refs/heads/main/assets/icon/fear_logo.ico">
-  <meta name="apple-mobile-web-app-title" content="Fear Music">
-  <title>Fear Music</title>
+  <title>Nhạc Của Tôi</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      /* Ngăn font tự động phóng to trên iOS khi xoay ngang */
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
+    /* Ngăn chặn mọi hành vi zoom trên web */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #121212;
@@ -23,6 +28,20 @@
       min-height: 100vh;
       padding-bottom: 260px;
       -webkit-overflow-scrolling: touch;
+      /* Khóa zoom hoàn toàn */
+      touch-action: pan-x pan-y;
+      -webkit-touch-callout: none;
+    }
+
+    /* Ngăn double-tap zoom trên các phần tử có thể click */
+    .tab, .icon-btn, .song-item, .ctrl-btn, .mode-btn, .volume-icon, .search-bar {
+      touch-action: manipulation;
+    }
+
+    /* Input không bị zoom khi focus (iOS) */
+    input, select, textarea {
+      font-size: 16px;
+      /* Font size >= 16px để tránh iOS tự động zoom khi focus */
     }
 
     .tabs-container {
@@ -36,6 +55,8 @@
       top: 0;
       z-index: 99;
       -webkit-overflow-scrolling: touch;
+      /* Ngăn zoom khi kéo ngang */
+      touch-action: pan-x pan-y;
     }
 
     .tab {
@@ -50,6 +71,8 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      /* Ngăn double-tap zoom */
+      touch-action: manipulation;
     }
 
     .tab.active {
@@ -76,6 +99,7 @@
       justify-content: center;
       font-size: 18px;
       transition: all 0.2s ease;
+      touch-action: manipulation;
     }
 
     .icon-btn:active {
@@ -112,6 +136,7 @@
       color: white;
       font-size: 16px;
       font-family: inherit;
+      /* Font 16px để tránh zoom iOS */
     }
 
     .search-bar::placeholder {
@@ -134,7 +159,6 @@
       padding: 0 20px;
     }
 
-    /* Bỏ album art - chỉ giữ thông tin */
     .song-info {
       text-align: center;
       margin: 30px 0 25px;
@@ -159,6 +183,7 @@
       margin: 20px 0;
       cursor: pointer;
       overflow: hidden;
+      touch-action: manipulation;
     }
 
     .progress {
@@ -183,6 +208,7 @@
       padding: 12px 10px;
       border-radius: 12px;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .song-item:hover, .song-item.playing {
@@ -217,6 +243,7 @@
       gap: 14px;
       margin-bottom: 14px;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .player-cover {
@@ -255,6 +282,7 @@
       border-radius: 999px;
       margin-top: 8px;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .progress-mini-fill {
@@ -280,6 +308,7 @@
       color: white;
       opacity: 0.8;
       transition: all 0.1s ease;
+      touch-action: manipulation;
     }
 
     .ctrl-btn:active {
@@ -313,6 +342,7 @@
       transition: all 0.1s ease;
       padding: 4px 10px;
       border-radius: 20px;
+      touch-action: manipulation;
     }
 
     .mode-btn.active {
@@ -337,6 +367,7 @@
       font-size: 16px;
       color: #1ed760;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .volume-slider {
@@ -345,6 +376,7 @@
       -webkit-appearance: none;
       background: #404040;
       border-radius: 999px;
+      touch-action: manipulation;
     }
 
     .volume-slider::-webkit-slider-thumb {
@@ -380,6 +412,7 @@
       height: 22px;
       margin-right: 12px;
       accent-color: #1ed760;
+      touch-action: manipulation;
     }
 
     .toast {
@@ -438,7 +471,6 @@
   </div>
 
   <div class="container">
-    <!-- Không còn album art -->
     <div class="song-info">
       <div class="title" id="title">Chọn bài hát</div>
       <div class="artist" id="artist"></div>
@@ -492,7 +524,30 @@
   <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple style="display:none;">
 
   <script>
-    // ==================== CONFIG ====================
+    // ==================== DISABLE ZOOM - THÊM SCRIPT CHẶN ZOOM ====================
+    // Ngăn pinch-to-zoom bằng JavaScript (lớp bảo vệ thứ 2)
+    document.addEventListener('touchmove', function(event) {
+      if (event.scale !== undefined && event.scale !== 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    // Ngăn double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Ngăn gesture zoom
+    document.addEventListener('gesturestart', function(event) {
+      event.preventDefault();
+    });
+
+    // ==================== CODE CHÍNH ====================
     let db;
     let playlists = {};
     let currentPlaylistName = "❤️";
@@ -506,7 +561,6 @@
     let shuffleMode = false;
     let repeatMode = false;
     let shuffledIndices = [];
-    let originalIndices = [];
 
     const audio = document.getElementById('audio');
     const fileInput = document.getElementById('fileInput');
@@ -526,7 +580,6 @@
     const shuffleBtn = document.getElementById('shuffleBtn');
     const repeatBtn = document.getElementById('repeatBtn');
 
-    // Volume
     let lastVolume = 70;
     audio.volume = 0.7;
 
@@ -718,7 +771,6 @@
       playBtnBar.innerHTML = '▶';
     });
 
-    // IndexedDB
     function initDB() {
       return new Promise((resolve) => {
         const req = indexedDB.open("MusicPlayerDB", 5);
@@ -839,7 +891,6 @@
       if (prev !== -1) playSong(currentPlaylistName, prev);
     }
 
-    // Render
     function renderTabs() {
       const cont = document.getElementById('tabs');
       if (!cont) return;
