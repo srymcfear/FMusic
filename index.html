@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Fear Music">
+  <meta name="apple-mobile-web-app-title" content="Nhạc Của Tôi">
   <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/srymcfear/verify_me/refs/heads/main/assets/icon/fear_logo.ico">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/srymcfear/verify_me/refs/heads/main/assets/icon/fear_logo.ico">
-  <title>Fear Music</title>
+  <title>Nhạc Của Tôi</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      /* Ngăn font tự động phóng to trên iOS khi xoay ngang */
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
     }
 
-    /* Ngăn chặn mọi hành vi zoom trên web */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #121212;
@@ -28,20 +26,16 @@
       min-height: 100vh;
       padding-bottom: 260px;
       -webkit-overflow-scrolling: touch;
-      /* Khóa zoom hoàn toàn */
       touch-action: pan-x pan-y;
       -webkit-touch-callout: none;
     }
 
-    /* Ngăn double-tap zoom trên các phần tử có thể click */
-    .tab, .icon-btn, .song-item, .ctrl-btn, .mode-btn, .volume-icon, .search-bar {
+    .tab, .icon-btn, .song-item, .ctrl-btn, .mode-btn, .volume-icon, .search-bar, .progress-container, .progress-mini {
       touch-action: manipulation;
     }
 
-    /* Input không bị zoom khi focus (iOS) */
     input, select, textarea {
       font-size: 16px;
-      /* Font size >= 16px để tránh iOS tự động zoom khi focus */
     }
 
     .tabs-container {
@@ -55,7 +49,6 @@
       top: 0;
       z-index: 99;
       -webkit-overflow-scrolling: touch;
-      /* Ngăn zoom khi kéo ngang */
       touch-action: pan-x pan-y;
     }
 
@@ -71,8 +64,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      /* Ngăn double-tap zoom */
-      touch-action: manipulation;
     }
 
     .tab.active {
@@ -99,7 +90,6 @@
       justify-content: center;
       font-size: 18px;
       transition: all 0.2s ease;
-      touch-action: manipulation;
     }
 
     .icon-btn:active {
@@ -136,7 +126,6 @@
       color: white;
       font-size: 16px;
       font-family: inherit;
-      /* Font 16px để tránh zoom iOS */
     }
 
     .search-bar::placeholder {
@@ -183,7 +172,6 @@
       margin: 20px 0;
       cursor: pointer;
       overflow: hidden;
-      touch-action: manipulation;
     }
 
     .progress {
@@ -208,7 +196,6 @@
       padding: 12px 10px;
       border-radius: 12px;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
     .song-item:hover, .song-item.playing {
@@ -224,7 +211,6 @@
       background: #282828;
     }
 
-    /* Player Bar */
     .player-bar {
       position: fixed;
       bottom: 0;
@@ -243,7 +229,6 @@
       gap: 14px;
       margin-bottom: 14px;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
     .player-cover {
@@ -282,7 +267,6 @@
       border-radius: 999px;
       margin-top: 8px;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
     .progress-mini-fill {
@@ -308,7 +292,6 @@
       color: white;
       opacity: 0.8;
       transition: all 0.1s ease;
-      touch-action: manipulation;
     }
 
     .ctrl-btn:active {
@@ -342,7 +325,6 @@
       transition: all 0.1s ease;
       padding: 4px 10px;
       border-radius: 20px;
-      touch-action: manipulation;
     }
 
     .mode-btn.active {
@@ -367,7 +349,6 @@
       font-size: 16px;
       color: #1ed760;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
     .volume-slider {
@@ -376,7 +357,6 @@
       -webkit-appearance: none;
       background: #404040;
       border-radius: 999px;
-      touch-action: manipulation;
     }
 
     .volume-slider::-webkit-slider-thumb {
@@ -412,7 +392,6 @@
       height: 22px;
       margin-right: 12px;
       accent-color: #1ed760;
-      touch-action: manipulation;
     }
 
     .toast {
@@ -428,6 +407,16 @@
       font-weight: 600;
       z-index: 2000;
       animation: fadeOut 2s ease forwards;
+    }
+
+    .toast.warning {
+      background: #f39c12;
+      color: black;
+    }
+
+    .toast.error {
+      background: #e74c3c;
+      color: white;
     }
 
     @keyframes fadeOut {
@@ -524,15 +513,92 @@
   <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple style="display:none;">
 
   <script>
-    // ==================== DISABLE ZOOM - THÊM SCRIPT CHẶN ZOOM ====================
-    // Ngăn pinch-to-zoom bằng JavaScript (lớp bảo vệ thứ 2)
+    // ==================== GIẢI PHÁP 1: YÊU CẦU QUYỀN LƯU TRỮ VĨNH VIỄN ====================
+    async function requestPersistentStorage() {
+      // Kiểm tra xem trình duyệt có hỗ trợ Storage API không
+      if (!navigator.storage || !navigator.storage.persist) {
+        console.log("⚠️ Trình duyệt không hỗ trợ Persistent Storage API");
+        showToast("⚠️ Thiết bị không hỗ trợ lưu trữ nâng cao", false, "warning");
+        return false;
+      }
+      
+      try {
+        // Kiểm tra xem đã được cấp quyền lưu trữ vĩnh viễn chưa
+        const isPersisted = await navigator.storage.persisted();
+        
+        if (isPersisted) {
+          console.log("✅ Đã có quyền lưu trữ vĩnh viễn");
+          showToast("✅ Đã được cấp quyền lưu trữ nâng cao", false, "success");
+          return true;
+        }
+        
+        // Yêu cầu quyền lưu trữ vĩnh viễn
+        console.log("📀 Đang yêu cầu quyền lưu trữ vĩnh viễn...");
+        const granted = await navigator.storage.persist();
+        
+        if (granted) {
+          console.log("✅ Đã được cấp quyền lưu trữ vĩnh viễn!");
+          showToast("✅ Đã được cấp quyền lưu trữ nâng cao! Có thể lưu file lớn hơn.", false, "success");
+          
+          // Lấy và hiển thị dung lượng khả dụng
+          if (navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            const availableMB = (estimate.quota / (1024 * 1024)).toFixed(0);
+            const usageMB = (estimate.usage / (1024 * 1024)).toFixed(0);
+            console.log(`📊 Dung lượng: Đã dùng ${usageMB}MB / Tối đa ${availableMB}MB`);
+            showToast(`💾 Khả dụng: ${availableMB}MB (đã dùng ${usageMB}MB)`, false, "info");
+          }
+          return true;
+        } else {
+          console.log("❌ Không được cấp quyền lưu trữ vĩnh viễn");
+          showToast("⚠️ Không được cấp quyền lưu trữ, file lớn có thể không lưu được", false, "warning");
+          return false;
+        }
+      } catch (err) {
+        console.error("Lỗi khi yêu cầu quyền lưu trữ:", err);
+        return false;
+      }
+    }
+    
+    // Kiểm tra dung lượng khả dụng
+    async function checkAvailableStorage() {
+      if (navigator.storage && navigator.storage.estimate) {
+        try {
+          const estimate = await navigator.storage.estimate();
+          const availableMB = (estimate.quota / (1024 * 1024)).toFixed(0);
+          const usageMB = (estimate.usage / (1024 * 1024)).toFixed(0);
+          return {
+            quota: estimate.quota,
+            usage: estimate.usage,
+            availableMB: parseInt(availableMB),
+            usageMB: parseInt(usageMB)
+          };
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    }
+    
+    // Hiển thị toast với loại khác nhau
+    function showToast(msg, isErr = false, type = "default") {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (type === "warning") toast.classList.add('warning');
+      if (type === "error") toast.classList.add('error');
+      if (isErr && type === "default") toast.classList.add('error');
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // ==================== CHỐNG ZOOM ====================
     document.addEventListener('touchmove', function(event) {
       if (event.scale !== undefined && event.scale !== 1) {
         event.preventDefault();
       }
     }, { passive: false });
-
-    // Ngăn double-tap zoom
+    
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(event) {
       const now = Date.now();
@@ -541,12 +607,11 @@
       }
       lastTouchEnd = now;
     }, false);
-
-    // Ngăn gesture zoom
+    
     document.addEventListener('gesturestart', function(event) {
       event.preventDefault();
     });
-
+    
     // ==================== CODE CHÍNH ====================
     let db;
     let playlists = {};
@@ -561,7 +626,10 @@
     let shuffleMode = false;
     let repeatMode = false;
     let shuffledIndices = [];
-
+    
+    // Giới hạn file (có thể điều chỉnh sau khi được cấp quyền)
+    let MAX_FILE_SIZE_MB = 50;
+    
     const audio = document.getElementById('audio');
     const fileInput = document.getElementById('fileInput');
     const titleEl = document.getElementById('title');
@@ -579,10 +647,10 @@
     const volumeIcon = document.getElementById('volumeIcon');
     const shuffleBtn = document.getElementById('shuffleBtn');
     const repeatBtn = document.getElementById('repeatBtn');
-
+    
     let lastVolume = 70;
     audio.volume = 0.7;
-
+    
     function updateVolumeIcon(value) {
       const v = parseInt(value);
       if (v == 0) volumeIcon.textContent = '🔇';
@@ -590,7 +658,7 @@
       else if (v < 70) volumeIcon.textContent = '🔉';
       else volumeIcon.textContent = '🔊';
     }
-
+    
     function handleVolumeChange() {
       const val = volumeSlider.value;
       audio.volume = val / 100;
@@ -598,7 +666,7 @@
       updateVolumeIcon(val);
       if (val > 0) lastVolume = val;
     }
-
+    
     function toggleMute() {
       if (volumeSlider.value > 0) {
         lastVolume = volumeSlider.value;
@@ -608,10 +676,10 @@
       }
       handleVolumeChange();
     }
-
+    
     volumeSlider.addEventListener('input', handleVolumeChange);
     handleVolumeChange();
-
+    
     function updateShuffleIndices() {
       const songs = playlists[currentPlaylistName] || [];
       const count = songs.length;
@@ -626,7 +694,7 @@
       }
       shuffledIndices = indices;
     }
-
+    
     function toggleShuffle() {
       shuffleMode = !shuffleMode;
       if (shuffleMode) {
@@ -638,7 +706,7 @@
       }
       showToast(shuffleMode ? "🔀 Phát ngẫu nhiên" : "➡️ Phát tuần tự");
     }
-
+    
     function toggleRepeat() {
       repeatMode = !repeatMode;
       if (repeatMode) {
@@ -649,7 +717,7 @@
         showToast("➡️ Phát một lần");
       }
     }
-
+    
     function getNextIndex() {
       const songs = playlists[currentPlaylistName];
       if (!songs || songs.length === 0) return -1;
@@ -678,7 +746,7 @@
         return nextIdx;
       }
     }
-
+    
     function getPrevIndex() {
       const songs = playlists[currentPlaylistName];
       if (!songs || songs.length === 0) return -1;
@@ -707,24 +775,14 @@
         return prevIdx;
       }
     }
-
-    function showToast(msg, isErr = false) {
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      toast.style.background = isErr ? '#e74c3c' : '#1ed760';
-      toast.style.color = isErr ? 'white' : 'black';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
-    }
-
+    
     function formatTime(sec) {
       if (isNaN(sec)) return "0:00";
       const m = Math.floor(sec / 60);
       const s = Math.floor(sec % 60);
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
-
+    
     function updateProgress() {
       if (!audio.duration) return;
       const p = (audio.currentTime / audio.duration) * 100;
@@ -733,25 +791,25 @@
       currentTimeSpan.textContent = formatTime(audio.currentTime);
       durationSpan.textContent = formatTime(audio.duration);
     }
-
+    
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('loadedmetadata', () => {
       durationSpan.textContent = formatTime(audio.duration);
     });
-
+    
     document.getElementById('progressContainer').addEventListener('click', (e) => {
       if (!audio.duration) return;
       const rect = e.currentTarget.getBoundingClientRect();
       audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     });
-
+    
     document.getElementById('progressMiniContainer').addEventListener('click', (e) => {
       if (!audio.duration) return;
       e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
       audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     });
-
+    
     audio.addEventListener('ended', () => {
       const next = getNextIndex();
       if (next !== -1) {
@@ -760,7 +818,7 @@
         audio.pause();
       }
     });
-
+    
     audio.addEventListener('play', () => {
       isPlaying = true;
       playBtnBar.innerHTML = '⏸';
@@ -770,10 +828,10 @@
       isPlaying = false;
       playBtnBar.innerHTML = '▶';
     });
-
+    
     function initDB() {
       return new Promise((resolve) => {
-        const req = indexedDB.open("MusicPlayerDB", 5);
+        const req = indexedDB.open("MusicPlayerDB", 6);
         req.onupgradeneeded = (e) => {
           db = e.target.result;
           if (!db.objectStoreNames.contains("songFiles")) {
@@ -784,15 +842,23 @@
         req.onerror = () => resolve();
       });
     }
-
+    
     async function saveSongFile(id, file, meta) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const tx = db.transaction("songFiles", "readwrite");
-        tx.objectStore("songFiles").put({ id, blob: file, ...meta });
-        tx.oncomplete = resolve;
+        const store = tx.objectStore("songFiles");
+        const request = store.put({ id, blob: file, ...meta });
+        request.onsuccess = () => resolve();
+        request.onerror = (err) => {
+          if (err.target.error.name === 'QuotaExceededError') {
+            reject(new Error('QuotaExceeded'));
+          } else {
+            reject(err);
+          }
+        };
       });
     }
-
+    
     async function getSongFile(id) {
       return new Promise((resolve) => {
         if (!db) { resolve(null); return; }
@@ -800,58 +866,130 @@
         req.onsuccess = () => resolve(req.result);
       });
     }
-
+    
     function loadPlaylists() {
-      const saved = localStorage.getItem('playlists_v5');
+      const saved = localStorage.getItem('playlists_v6');
       if (saved) playlists = JSON.parse(saved);
       else playlists = { "❤️": [] };
       if (!playlists["❤️"]) playlists["❤️"] = [];
       currentPlaylistName = "❤️";
     }
-
+    
     function savePlaylists() {
-      localStorage.setItem('playlists_v5', JSON.stringify(playlists));
+      localStorage.setItem('playlists_v6', JSON.stringify(playlists));
     }
-
+    
     async function addSongToPlaylist(file) {
-      if (!file.name.endsWith('.mp3')) {
+      if (!file.name.toLowerCase().endsWith('.mp3')) {
         showToast(`⚠️ ${file.name} không phải MP3`, true);
         return false;
       }
+      
+      const sizeMB = file.size / (1024 * 1024);
+      
+      // Kiểm tra dung lượng với giới hạn hiện tại
+      if (sizeMB > MAX_FILE_SIZE_MB) {
+        showToast(`❌ ${file.name} (${sizeMB.toFixed(1)}MB) vượt quá giới hạn ${MAX_FILE_SIZE_MB}MB`, true);
+        return false;
+      }
+      
+      if (sizeMB > 40) {
+        showToast(`⚠️ ${file.name} (${sizeMB.toFixed(1)}MB) rất lớn, có thể ảnh hưởng hiệu suất`, false, "warning");
+      } else if (sizeMB > 30) {
+        showToast(`📀 ${file.name} (${sizeMB.toFixed(1)}MB) - file lớn, vẫn có thể phát được`, false, "info");
+      }
+      
       const id = 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const title = file.name.replace(/\.mp3$/i, "");
-      await saveSongFile(id, file, { title, artist: "Local", cover: "https://picsum.photos/id/870/100/100" });
-      playlists[currentPlaylistName].push({ id, title, artist: "Local", cover: "https://picsum.photos/id/870/100/100" });
-      savePlaylists();
-      return true;
+      
+      try {
+        await saveSongFile(id, file, { 
+          title, 
+          artist: "Local", 
+          cover: "https://i1-e.pinimg.com/1200x/ae/ff/e1/aeffe15f4698dae17ae22cd6a3eed479.jpg",
+          fileSize: file.size
+        });
+        
+        playlists[currentPlaylistName].push({ 
+          id, 
+          title, 
+          artist: "Local", 
+          cover: "https://i1-e.pinimg.com/1200x/ae/ff/e1/aeffe15f4698dae17ae22cd6a3eed479.jpg",
+          fileSize: file.size
+        });
+        savePlaylists();
+        return true;
+      } catch (err) {
+        if (err.message === 'QuotaExceeded') {
+          showToast(`❌ Hết dung lượng lưu trữ! Hãy xóa bớt bài hát cũ.`, true);
+        } else {
+          showToast(`❌ Lỗi lưu file: ${err.message}`, true);
+        }
+        return false;
+      }
     }
-
+    
     async function addSongs() { fileInput.click(); }
-
+    
     fileInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       if (!files.length) return;
-      showToast(`📀 Đang thêm...`);
+      
+      // Kiểm tra dung lượng khả dụng trước khi thêm nhiều file
+      const storage = await checkAvailableStorage();
+      if (storage) {
+        let totalSize = 0;
+        for (let f of files) totalSize += f.size;
+        const totalMB = totalSize / (1024 * 1024);
+        if (storage.availableMB < totalMB + 10) {
+          showToast(`⚠️ Dung lượng trống (${storage.availableMB}MB) có thể không đủ cho ${totalMB.toFixed(0)}MB`, false, "warning");
+        }
+      }
+      
+      showToast(`📀 Đang thêm ${files.length} bài...`);
       let added = 0;
-      for (let f of files) if (await addSongToPlaylist(f)) added++;
-      if (added) { renderPlaylist(); renderTabs(); showToast(`✅ Đã thêm ${added} bài`); }
+      for (let f of files) {
+        if (await addSongToPlaylist(f)) added++;
+        await new Promise(r => setTimeout(r, 50)); // Delay nhẹ tránh quá tải
+      }
+      
+      if (added) { 
+        renderPlaylist(); 
+        renderTabs(); 
+        showToast(`✅ Đã thêm ${added} bài`);
+        
+        // Hiển thị lại dung lượng sau khi thêm
+        const newStorage = await checkAvailableStorage();
+        if (newStorage) {
+          console.log(`📊 Dung lượng sau khi thêm: Đã dùng ${newStorage.usageMB}MB / ${newStorage.availableMB}MB`);
+        }
+      }
       else showToast(`❌ Thêm thất bại`, true);
       fileInput.value = '';
     });
-
+    
     async function playSong(playlistName, index) {
       const playlist = playlists[playlistName];
       if (!playlist || index >= playlist.length) return;
+      
       currentPlaylistName = playlistName;
       currentIndex = index;
       const song = playlist[currentIndex];
       currentSongId = song.id;
       
-      const data = await getSongFile(song.id);
-      if (!data?.blob) { showToast(`❌ Không tìm thấy file`, true); return; }
+      const fileData = await getSongFile(song.id);
+      if (!fileData || !fileData.blob) {
+        showToast(`❌ Không tìm thấy file: ${song.title}`, true);
+        return;
+      }
+      
+      const sizeMB = fileData.blob.size / (1024 * 1024);
+      if (sizeMB > 45) {
+        showToast(`⚠️ File lớn (${sizeMB.toFixed(1)}MB), có thể tải chậm`, false, "warning");
+      }
       
       if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-      currentBlobUrl = URL.createObjectURL(data.blob);
+      currentBlobUrl = URL.createObjectURL(fileData.blob);
       audio.src = currentBlobUrl;
       audio.load();
       
@@ -867,11 +1005,18 @@
         });
       }
       
-      try { await audio.play(); } catch(e) {}
+      try { 
+        await audio.play(); 
+      } catch(e) { 
+        console.log("Play error:", e);
+        if (e.name === 'NotSupportedError') {
+          showToast(`❌ Không thể phát file này. Có thể file quá lớn hoặc bị lỗi.`, true);
+        }
+      }
       renderPlaylist();
       renderTabs();
     }
-
+    
     async function togglePlay() {
       if (!audio.src) {
         const s = playlists[currentPlaylistName];
@@ -880,17 +1025,17 @@
       }
       isPlaying ? audio.pause() : await audio.play();
     }
-
+    
     function nextSong() {
       const next = getNextIndex();
       if (next !== -1) playSong(currentPlaylistName, next);
     }
-
+    
     function prevSong() {
       const prev = getPrevIndex();
       if (prev !== -1) playSong(currentPlaylistName, prev);
     }
-
+    
     function renderTabs() {
       const cont = document.getElementById('tabs');
       if (!cont) return;
@@ -900,7 +1045,7 @@
         return `<div class="tab ${name === currentPlaylistName ? 'active' : ''}" onclick="switchPlaylist('${name.replace(/'/g, "\\'")}')"><span>${name}</span></div>`;
       }).join('');
     }
-
+    
     function switchPlaylist(name) {
       currentPlaylistName = name;
       selectedSongs.clear();
@@ -909,12 +1054,12 @@
       renderTabs();
       renderPlaylist();
     }
-
+    
     function filterSongs() {
       currentSearchQuery = document.getElementById('searchInput').value.toLowerCase();
       renderPlaylist();
     }
-
+    
     function renderPlaylist() {
       const cont = document.getElementById('playlistContainer');
       let songs = playlists[currentPlaylistName] || [];
@@ -935,9 +1080,9 @@
       const delBtn = document.getElementById('deleteSelectedBtn');
       if (delBtn) delBtn.style.display = selectedSongs.size ? 'flex' : 'none';
     }
-
+    
     function escapeHtml(str) { return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-
+    
     window.playSongByIndex = function(idx) {
       let songs = playlists[currentPlaylistName] || [];
       if (currentSearchQuery) {
@@ -948,19 +1093,19 @@
         }
       } else { playSong(currentPlaylistName, idx); }
     };
-
+    
     window.toggleSelect = function(id) {
       selectedSongs.has(id) ? selectedSongs.delete(id) : selectedSongs.add(id);
       renderPlaylist();
     };
-
+    
     window.toggleSelectAll = function() {
       const songs = playlists[currentPlaylistName] || [];
       if (selectedSongs.size === songs.length) selectedSongs.clear();
       else songs.forEach(s => selectedSongs.add(s.id));
       renderPlaylist();
     };
-
+    
     window.deleteSelected = function() {
       if (!selectedSongs.size) return;
       if (!confirm(`Xóa ${selectedSongs.size} bài?`)) return;
@@ -973,21 +1118,42 @@
       savePlaylists();
       renderPlaylist();
     };
-
+    
     function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
+    
     if (navigator.mediaSession) {
       navigator.mediaSession.setActionHandler('play', () => togglePlay());
       navigator.mediaSession.setActionHandler('pause', () => audio.pause());
       navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
       navigator.mediaSession.setActionHandler('previoustrack', () => prevSong());
     }
-
+    
+    // ==================== KHỞI TẠO ====================
     async function init() {
       loadPlaylists();
+      
+      // BƯỚC 1: Yêu cầu quyền lưu trữ vĩnh viễn (GIẢI PHÁP 1)
+      const hasPersistent = await requestPersistentStorage();
+      
+      // Nếu được cấp quyền, tăng giới hạn file lên
+      if (hasPersistent) {
+        MAX_FILE_SIZE_MB = 100; // Tăng lên 100MB nếu được cấp quyền
+        showToast(`📀 Đã bật chế độ lưu trữ nâng cao! Có thể lưu file lên ${MAX_FILE_SIZE_MB}MB`, false, "success");
+      } else {
+        MAX_FILE_SIZE_MB = 45; // Giới hạn an toàn nếu không có quyền
+        showToast(`📀 Chế độ lưu trữ cơ bản, giới hạn file ${MAX_FILE_SIZE_MB}MB`, false, "info");
+      }
+      
       await initDB();
       renderTabs();
       renderPlaylist();
+      
+      // Hiển thị thông tin dung lượng
+      const storage = await checkAvailableStorage();
+      if (storage) {
+        console.log(`📊 Dung lượng khả dụng: ${storage.availableMB}MB (đã dùng ${storage.usageMB}MB)`);
+      }
+      
       showToast("🎵 Nhấn + để thêm nhạc MP3");
     }
     init();
