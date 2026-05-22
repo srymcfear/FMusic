@@ -6,7 +6,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nhạc Của Tôi">
-  <link rel="apple-touch-icon" href="https://emojiisland.com/cdn/shop/products/Green_Music_Note_Emoji_Icon_ios10_large.png?v=1571606036">
   <title>Nhạc Của Tôi</title>
   <style>
     * {
@@ -134,41 +133,21 @@
       padding: 0 20px;
     }
 
-    .album-art {
-      width: 100%;
-      max-width: 300px;
-      height: 300px;
-      margin: 20px auto 25px;
-      border-radius: 20px;
-      background-size: cover;
-      background-position: center;
-      background-color: #282828;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .album-art.rotating {
-      animation: rotate 20s linear infinite;
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
+    /* Bỏ album art - chỉ giữ thông tin */
     .song-info {
       text-align: center;
-      margin-bottom: 25px;
+      margin: 30px 0 25px;
     }
 
     .title {
-      font-size: 22px;
+      font-size: 26px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       word-break: break-word;
     }
 
     .artist {
-      font-size: 16px;
+      font-size: 18px;
       color: #b3b3b3;
     }
 
@@ -210,11 +189,12 @@
     }
 
     .song-item img {
-      width: 50px;
-      height: 50px;
+      width: 44px;
+      height: 44px;
       border-radius: 8px;
       margin-right: 14px;
       object-fit: cover;
+      background: #282828;
     }
 
     /* Player Bar */
@@ -239,10 +219,11 @@
     }
 
     .player-cover {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
       object-fit: cover;
+      background: #282828;
     }
 
     .player-info {
@@ -286,7 +267,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 24px;
+      gap: 28px;
       margin: 14px 0 16px;
     }
 
@@ -318,7 +299,7 @@
     .mode-buttons {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      gap: 24px;
       margin-bottom: 14px;
     }
 
@@ -329,7 +310,7 @@
       cursor: pointer;
       opacity: 0.5;
       transition: all 0.1s ease;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 20px;
     }
 
@@ -422,9 +403,11 @@
     }
 
     @media (max-width: 480px) {
-      .album-art {
-        max-width: 260px;
-        height: 260px;
+      .title {
+        font-size: 22px;
+      }
+      .artist {
+        font-size: 15px;
       }
       .ctrl-btn.prev, .ctrl-btn.next {
         font-size: 24px;
@@ -433,6 +416,10 @@
         width: 50px;
         height: 50px;
         font-size: 24px;
+      }
+      .player-cover {
+        width: 44px;
+        height: 44px;
       }
     }
   </style>
@@ -450,7 +437,7 @@
   </div>
 
   <div class="container">
-    <div id="albumArt" class="album-art" style="background-image: url('https://picsum.photos/id/870/400/400');"></div>
+    <!-- Không còn album art -->
     <div class="song-info">
       <div class="title" id="title">Chọn bài hát</div>
       <div class="artist" id="artist"></div>
@@ -515,16 +502,13 @@
     let currentSongId = null;
     let currentBlobUrl = null;
     
-    // New features
     let shuffleMode = false;
-    let repeatMode = false; // false: normal, true: repeat all
+    let repeatMode = false;
     let shuffledIndices = [];
     let originalIndices = [];
 
-    // DOM elements
     const audio = document.getElementById('audio');
     const fileInput = document.getElementById('fileInput');
-    const albumArtDiv = document.getElementById('albumArt');
     const titleEl = document.getElementById('title');
     const artistEl = document.getElementById('artist');
     const barTitle = document.getElementById('barTitle');
@@ -574,7 +558,6 @@
     volumeSlider.addEventListener('input', handleVolumeChange);
     handleVolumeChange();
 
-    // Shuffle functions
     function updateShuffleIndices() {
       const songs = playlists[currentPlaylistName] || [];
       const count = songs.length;
@@ -582,19 +565,12 @@
         shuffledIndices = [];
         return;
       }
-      // Create array of indices 0..count-1
       let indices = Array.from({ length: count }, (_, i) => i);
-      // Fisher-Yates shuffle
       for (let i = indices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [indices[i], indices[j]] = [indices[j], indices[i]];
       }
       shuffledIndices = indices;
-      // Find current index position in shuffled array
-      const currentPos = shuffledIndices.findIndex(i => i === currentIndex);
-      if (currentPos !== -1) {
-        originalIndices = shuffledIndices;
-      }
     }
 
     function toggleShuffle() {
@@ -734,13 +710,11 @@
     audio.addEventListener('play', () => {
       isPlaying = true;
       playBtnBar.innerHTML = '⏸';
-      albumArtDiv.classList.add('rotating');
     });
     
     audio.addEventListener('pause', () => {
       isPlaying = false;
       playBtnBar.innerHTML = '▶';
-      albumArtDiv.classList.remove('rotating');
     });
 
     // IndexedDB
@@ -793,8 +767,8 @@
       }
       const id = 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const title = file.name.replace(/\.mp3$/i, "");
-      await saveSongFile(id, file, { title, artist: "Local", cover: "https://picsum.photos/id/870/400/400" });
-      playlists[currentPlaylistName].push({ id, title, artist: "Local", cover: "https://picsum.photos/id/870/400/400" });
+      await saveSongFile(id, file, { title, artist: "Local", cover: "https://picsum.photos/id/870/100/100" });
+      playlists[currentPlaylistName].push({ id, title, artist: "Local", cover: "https://picsum.photos/id/870/100/100" });
       savePlaylists();
       return true;
     }
@@ -830,15 +804,13 @@
       
       titleEl.textContent = song.title;
       artistEl.textContent = song.artist;
-      albumArtDiv.style.backgroundImage = `url('${song.cover}')`;
       barTitle.textContent = song.title;
       barArtist.textContent = song.artist;
       barCover.src = song.cover;
       
       if (navigator.mediaSession) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: song.title, artist: song.artist,
-          artwork: [{ src: song.cover, sizes: '512x512' }]
+          title: song.title, artist: song.artist
         });
       }
       
