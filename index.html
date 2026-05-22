@@ -926,7 +926,7 @@
         let html = `<div class="section-title">📀 ${currentPlaylistName === "❤️" ? "Yêu thích" : currentPlaylistName} (${songs.length})</div>`;
         html += songs.map((s, i) => `<div class="song-item ${currentSongId === s.id ? 'playing' : ''}" onclick="playSongByIndex(${i})">
           <input type="checkbox" ${selectedSongs.has(s.id) ? 'checked' : ''} onclick="event.stopPropagation(); toggleSelect('${s.id}')">
-          <img src="${s.cover}" onerror="this.src='https://picsum.photos/id/870/100/100'">
+          <img src="${s.cover}" onerror="this.src='https://i1-e.pinimg.com/1200x/ae/ff/e1/aeffe15f4698dae17ae22cd6a3eed479.jpg'">
           <div style="flex:1"><div style="font-weight:600;">${escapeHtml(s.title)}</div><div style="color:#b3b3b3;font-size:13px;">${escapeHtml(s.artist)}</div></div>
           ${currentSongId === s.id && isPlaying ? '<span style="color:#1ed760;">🔊</span>' : ''}
         </div>`).join('');
