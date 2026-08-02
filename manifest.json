@@ -1,0 +1,17 @@
+{
+  "name": "Nhạc Của Tôi - FEAR Music",
+  "short_name": "Nhạc Của Tôi",
+  "start_url": "./app_music.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0b10",
+  "theme_color": "#0a0b10",
+  "description": "Trình phát nhạc Offline dành cho iPhone & Web",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/srymcfear/verify_me/refs/heads/main/assets/icon/fear_logo.ico",
+      "sizes": "192x192 512x512",
+      "type": "image/x-icon"
+    }
+  ]
+}
