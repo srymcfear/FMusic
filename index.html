@@ -91,7 +91,7 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     /* Tabs Bar */
@@ -188,6 +188,12 @@
       background: var(--accent-gradient);
       border: none;
       box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    .icon-action-btn.drive {
+      background: linear-gradient(135deg, #00f0ff 0%, #8a2be2 100%);
+      border: none;
+      box-shadow: 0 2px 10px rgba(0, 240, 255, 0.3);
     }
 
     .icon-action-btn.danger {
@@ -680,6 +686,118 @@
       cursor: pointer;
     }
 
+    /* Google Drive Modal */
+    .gdrive-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 3000;
+      background: rgba(9, 10, 15, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .gdrive-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .gdrive-card {
+      background: rgba(20, 22, 35, 0.95);
+      border: 1px solid var(--accent-purple);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 440px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px var(--accent-glow);
+    }
+
+    .gdrive-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .gdrive-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .gdrive-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gdrive-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .gdrive-textarea {
+      width: 100%;
+      height: 90px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      color: #ffffff;
+      padding: 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+    }
+
+    .gdrive-textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }
+
+    .gdrive-btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .gdrive-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    .gdrive-btn:active { transform: scale(0.96); }
+    .gdrive-btn.submit {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .gdrive-btn.cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
     /* PWA iOS Prompt Banner */
     .pwa-ios-banner {
       position: fixed;
@@ -797,10 +915,13 @@
         FEAR MUSIC
       </div>
       <div class="header-actions">
+        <button class="icon-action-btn drive" onclick="openDriveModal()" title="Nhập Nhạc Từ Google Drive">
+          ☁️
+        </button>
         <button class="icon-action-btn" onclick="toggleSelectAll()" title="Chọn tất cả">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <button class="icon-action-btn accent" onclick="addSongs()" title="Thêm Nhạc MP3">
+        <button class="icon-action-btn accent" onclick="addSongs()" title="Thêm Nhạc MP3 Từ Máy">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
       </div>
@@ -931,6 +1052,33 @@
         <span id="volumeIcon" onclick="toggleMute()" style="cursor: pointer; font-size: 18px;">🔊</span>
         <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
         <span id="volumePercent" style="font-size: 12px; color: var(--text-muted); font-weight: 600; min-width: 36px; text-align: right;">70%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Drive Import Modal -->
+  <div class="gdrive-modal" id="gdriveModal">
+    <div class="gdrive-card">
+      <div class="gdrive-header">
+        <div class="gdrive-title">
+          <span>☁️</span> Nhập Nhạc Google Drive
+        </div>
+        <button class="pwa-close" onclick="closeDriveModal()">✕</button>
+      </div>
+
+      <div class="gdrive-input-group">
+        <label class="gdrive-label">Dán Link Thư mục hoặc Link File MP3 Google Drive:</label>
+        <textarea id="driveUrlInput" class="gdrive-textarea" placeholder="https://drive.google.com/drive/folders/1ABCXYZ...&#10;hoặc link file: https://drive.google.com/file/d/1XYZ.../view&#10;(Có thể dán nhiều link cách nhau bằng xuống dòng)"></textarea>
+        
+        <label class="gdrive-label">Google Drive API Key (Tùy chọn - Dùng để quét nguyên Folder):</label>
+        <input type="text" id="driveApiKeyInput" class="search-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); border-radius: 12px; padding: 8px 12px;" placeholder="Dán API Key (nếu muốn tải toàn bộ folder)...">
+      </div>
+
+      <div class="gdrive-btn-group">
+        <button class="gdrive-btn cancel" onclick="closeDriveModal()">Hủy</button>
+        <button class="gdrive-btn submit" id="driveSubmitBtn" onclick="importFromGoogleDrive()">
+          ⚡ Tải Nhạc Vào Máy
+        </button>
       </div>
     </div>
   </div>
@@ -1069,6 +1217,17 @@
       durationSpan.textContent = durFormatted;
       sheetCurrentTime.textContent = currFormatted;
       sheetDuration.textContent = durFormatted;
+
+      // Update iOS MediaSession Position State
+      if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: audio.duration,
+            playbackRate: audio.playbackRate || 1.0,
+            position: audio.currentTime
+          });
+        } catch (e) { /* ignore position errors */ }
+      }
     }
 
     audio.addEventListener('timeupdate', updateProgress);
@@ -1082,6 +1241,7 @@
       const rect = e.currentTarget.getBoundingClientRect();
       const pct = (e.clientX - rect.left) / rect.width;
       audio.currentTime = pct * audio.duration;
+      updateProgress();
     }
 
     audio.addEventListener('ended', () => nextSong());
@@ -1092,6 +1252,10 @@
       miniPlayIcon.innerHTML = pauseSvg;
       sheetPlayIcon.innerHTML = pauseSvg;
       vinylContainer.classList.add('spinning');
+      
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
       renderPlaylist();
     });
 
@@ -1101,6 +1265,10 @@
       miniPlayIcon.innerHTML = playSvg;
       sheetPlayIcon.innerHTML = playSvg;
       vinylContainer.classList.remove('spinning');
+
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+      }
       renderPlaylist();
     });
 
@@ -1111,6 +1279,171 @@
 
     function closePlayerSheet() {
       document.getElementById('playerSheetModal').classList.remove('open');
+    }
+
+    // Google Drive Modal Controls
+    function openDriveModal() {
+      const savedKey = localStorage.getItem('fear_gdrive_api_key') || '';
+      document.getElementById('driveApiKeyInput').value = savedKey;
+      document.getElementById('gdriveModal').classList.add('open');
+    }
+
+    function closeDriveModal() {
+      document.getElementById('gdriveModal').classList.remove('open');
+    }
+
+    // Extract File & Folder IDs from Google Drive URLs
+    function parseDriveFileId(str) {
+      if (!str) return '';
+      const matchD = str.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (matchD) return matchD[1];
+      const matchId = str.match(/id=([a-zA-Z0-9_-]+)/);
+      if (matchId) return matchId[1];
+      const clean = str.trim();
+      if (/^[a-zA-Z0-9_-]{25,}$/.test(clean)) return clean;
+      return '';
+    }
+
+    function parseDriveFolderId(str) {
+      if (!str) return '';
+      const matchFold = str.match(/folders\/([a-zA-Z0-9_-]+)/);
+      if (matchFold) return matchFold[1];
+      const clean = str.trim();
+      if (/^[a-zA-Z0-9_-]{25,}$/.test(clean)) return clean;
+      return '';
+    }
+
+    // Import Songs from Google Drive
+    async function importFromGoogleDrive() {
+      const rawText = document.getElementById('driveUrlInput').value.trim();
+      const apiKey = document.getElementById('driveApiKeyInput').value.trim();
+      if (apiKey) localStorage.setItem('fear_gdrive_api_key', apiKey);
+
+      if (!rawText) {
+        showToast("⚠️ Vui lòng dán link hoặc ID Google Drive", true);
+        return;
+      }
+
+      const submitBtn = document.getElementById('driveSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "⏳ Đang quét & Tải...";
+
+      const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+      let fileQueue = [];
+
+      for (let line of lines) {
+        const folderId = parseDriveFolderId(line);
+        if (folderId && line.includes('folders')) {
+          if (!apiKey) {
+            showToast("⚠️ Cần Google Drive API Key để quét Folder!", true);
+          } else {
+            showToast("🔍 Đang tìm bài hát trong Folder Drive...");
+            try {
+              const res = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+(mimeType+contains+'audio'+or+name+contains+'.mp3')&fields=files(id,name)&key=${apiKey}`);
+              const data = await res.json();
+              if (data.files && data.files.length > 0) {
+                data.files.forEach(f => fileQueue.push({ id: f.id, name: f.name }));
+              } else {
+                showToast("⚠️ Không tìm thấy file MP3 trong Folder này", true);
+              }
+            } catch (err) {
+              console.error(err);
+              showToast("❌ Lỗi quét Folder Google Drive", true);
+            }
+          }
+        } else {
+          const fileId = parseDriveFileId(line);
+          if (fileId) {
+            fileQueue.push({ id: fileId, name: `GDrive_Track_${fileId.substr(0,6)}` });
+          }
+        }
+      }
+
+      if (fileQueue.length === 0) {
+        showToast("⚠️ Không nhận diện được link Google Drive hợp lệ", true);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "⚡ Tải Nhạc Vào Máy";
+        return;
+      }
+
+      let successCount = 0;
+      for (let i = 0; i < fileQueue.length; i++) {
+        const item = fileQueue[i];
+        showToast(`📥 Đang tải [${i+1}/${fileQueue.length}]: ${item.name}...`);
+        
+        try {
+          const downloadUrl = `https://drive.google.com/uc?export=download&id=${item.id}`;
+          const res = await fetch(downloadUrl);
+          if (!res.ok) throw new Error("Fetch failed");
+          const blob = await res.blob();
+          
+          if (blob.size < 5000) {
+            throw new Error("Invalid audio blob size");
+          }
+
+          const songId = 'g_' + item.id + '_' + Date.now();
+          const cleanTitle = item.name.replace(/\.(mp3|mpeg)$/i, "");
+          
+          await saveSongFile(songId, blob, {
+            title: cleanTitle,
+            artist: "Google Drive",
+            cover: "./bick.jpg",
+            dateAdded: Date.now()
+          });
+
+          playlists[currentPlaylistName].push({
+            id: songId,
+            title: cleanTitle,
+            artist: "Google Drive",
+            cover: "./bick.jpg",
+            dateAdded: Date.now()
+          });
+          
+          savePlaylists();
+          successCount++;
+        } catch (err) {
+          console.warn("Direct download failed, trying proxy for ID:", item.id, err);
+          try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${item.id}`)}`;
+            const resProxy = await fetch(proxyUrl);
+            const blobProxy = await resProxy.blob();
+            
+            const songId = 'g_' + item.id + '_' + Date.now();
+            const cleanTitle = item.name.replace(/\.(mp3|mpeg)$/i, "");
+            
+            await saveSongFile(songId, blobProxy, {
+              title: cleanTitle,
+              artist: "Google Drive",
+              cover: "./bick.jpg",
+              dateAdded: Date.now()
+            });
+
+            playlists[currentPlaylistName].push({
+              id: songId,
+              title: cleanTitle,
+              artist: "Google Drive",
+              cover: "./bick.jpg",
+              dateAdded: Date.now()
+            });
+            savePlaylists();
+            successCount++;
+          } catch (e2) {
+            console.error("Proxy fetch failed:", e2);
+          }
+        }
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = "⚡ Tải Nhạc Vào Máy";
+      closeDriveModal();
+
+      if (successCount > 0) {
+        renderPlaylist();
+        renderTabs();
+        showToast(`✅ Đã lưu ${successCount} bài hát Google Drive Offline!`);
+      } else {
+        showToast(`❌ Không thể tải nhạc từ Google Drive (Hãy kiểm tra quyền Chia Sẻ công khai file)`, true);
+      }
     }
 
     // IndexedDB Management
@@ -1257,7 +1590,7 @@
     }
 
     async function togglePlay() {
-      if (!audio.src || audio.src === "") {
+      if (!audio.src || audio.src === "" || audio.src === "about:blank") {
         const songs = playlists[currentPlaylistName];
         if (songs?.length) playSong(currentPlaylistName, 0);
         return;
@@ -1269,12 +1602,13 @@
         try {
           await audio.play();
         } catch (err) {
+          console.warn("Play error, reloading Blob:", err);
           if (currentSongId) {
             const fileData = await getSongFile(currentSongId);
             if (fileData?.blob) {
               if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
               currentBlobUrl = URL.createObjectURL(fileData.blob);
-              const savedTime = audio.currentTime;
+              const savedTime = audio.currentTime || 0;
               audio.src = currentBlobUrl;
               audio.load();
               audio.currentTime = savedTime;
@@ -1361,8 +1695,8 @@
       
       if (songs.length === 0) {
         let msg = currentPlaylistName === "❤️" 
-          ? "Chưa có bài hát nào.<br>Nhấn nút <strong>+</strong> để thêm nhạc MP3 từ máy của bạn."
-          : "Playlist trống.<br>Nhấn nút <strong>+</strong> để thêm bài hát.";
+          ? "Chưa có bài hát nào.<br>Nhấn <strong>+</strong> để chọn MP3 hoặc nút <strong>☁️ Drive</strong> để tải từ Google Drive."
+          : "Playlist trống.<br>Nhấn nút <strong>+</strong> hoặc <strong>☁️ Drive</strong> để thêm bài hát.";
         container.innerHTML = `<div class="empty-state-box">🎵 ${msg}</div>`;
       } else {
         container.innerHTML = songs.map((song, idx) => {
@@ -1454,11 +1788,59 @@
       showToast("🗑 Đã xóa bài hát khỏi danh sách");
     };
 
+    // Lockscreen MediaSession API Configuration
     if ('mediaSession' in navigator) {
-      navigator.mediaSession.setActionHandler('play', () => togglePlay());
-      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+      navigator.mediaSession.setActionHandler('play', async () => {
+        try {
+          await audio.play();
+        } catch (err) {
+          console.warn("Lockscreen play retry:", err);
+          if (currentSongId) {
+            const fileData = await getSongFile(currentSongId);
+            if (fileData?.blob) {
+              if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+              currentBlobUrl = URL.createObjectURL(fileData.blob);
+              const savedTime = audio.currentTime || 0;
+              audio.src = currentBlobUrl;
+              audio.load();
+              audio.currentTime = savedTime;
+              try { await audio.play(); } catch(e2) { console.error(e2); }
+            }
+          }
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+      });
+
       navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
       navigator.mediaSession.setActionHandler('previoustrack', () => prevSong());
+
+      try {
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (details.seekTime !== undefined && audio.duration) {
+            audio.currentTime = details.seekTime;
+            updateProgress();
+          }
+        });
+      } catch(e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+          updateProgress();
+        });
+      } catch(e) {}
+
+      try {
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration || 0);
+          updateProgress();
+        });
+      } catch(e) {}
     }
 
     async function init() {
