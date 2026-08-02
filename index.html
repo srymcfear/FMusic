@@ -1006,7 +1006,7 @@
     </div>
   </div>
 
-  <!-- Full Player Sheet Modal -->
+  <!-- Full Player Overlay Sheet -->
   <div class="player-sheet-modal" id="playerSheetModal">
     <div class="sheet-header">
       <button class="sheet-close-btn" onclick="closePlayerSheet()">
@@ -1068,7 +1068,7 @@
 
       <div class="gdrive-input-group">
         <label class="gdrive-label">Dán Link Thư mục hoặc Link File MP3 Google Drive:</label>
-        <textarea id="driveUrlInput" class="gdrive-textarea" placeholder="https://drive.google.com/drive/folders/1ABCXYZ...&#10;hoặc link file: https://drive.google.com/file/d/1XYZ.../view&#10;(Có thể dán nhiều link cách nhau bằng xuống dòng)"></textarea>
+        <textarea id="driveUrlInput" class="gdrive-textarea" placeholder="https://drive.google.com/drive/folders/1ABCXYZ...&#10;hoặc link file: https://drive.google.com/file/d/1XYZ.../view&#10;(Lưu ý: Cần mở Bật quyền Chia sẻ Công Khai cho link)"></textarea>
         
         <label class="gdrive-label">Google Drive API Key (Tùy chọn - Dùng để quét nguyên Folder):</label>
         <input type="text" id="driveApiKeyInput" class="search-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); border-radius: 12px; padding: 8px 12px;" placeholder="Dán API Key (nếu muốn tải toàn bộ folder)...">
@@ -1168,9 +1168,11 @@
 
     // Volume Handling
     audio.volume = 0.7;
+    audio.muted = false;
     function handleVolumeChange() {
       const val = parseInt(volumeSlider.value);
       audio.volume = val / 100;
+      audio.muted = (val === 0);
       volumePercent.textContent = val + '%';
       
       if (val === 0) volumeIcon.textContent = '🔇';
@@ -1371,20 +1373,49 @@
         const item = fileQueue[i];
         showToast(`📥 Đang tải [${i+1}/${fileQueue.length}]: ${item.name}...`);
         
-        try {
-          const downloadUrl = `https://drive.google.com/uc?export=download&id=${item.id}`;
-          const res = await fetch(downloadUrl);
-          if (!res.ok) throw new Error("Fetch failed");
-          const blob = await res.blob();
-          
-          if (blob.size < 5000) {
-            throw new Error("Invalid audio blob size");
-          }
+        let validBlob = null;
+        const candidateUrls = [
+          `https://drive.google.com/uc?export=download&confirm=no_antivirus&id=${item.id}`,
+          `https://lh3.googleusercontent.com/u/0/d/${item.id}`,
+          `https://docs.google.com/uc?export=download&id=${item.id}`
+        ];
 
+        for (let dlUrl of candidateUrls) {
+          try {
+            const res = await fetch(dlUrl);
+            if (res.ok) {
+              const tempBlob = await res.blob();
+              const sampleText = await tempBlob.slice(0, 150).text().catch(() => '');
+              if (!sampleText.includes('<!DOCTYPE') && !sampleText.includes('<html') && tempBlob.size > 20000) {
+                validBlob = new Blob([tempBlob], { type: 'audio/mpeg' });
+                break;
+              }
+            }
+          } catch(e) {}
+        }
+
+        // Try CORS Proxy if direct fetch blocked
+        if (!validBlob) {
+          try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&confirm=no_antivirus&id=${item.id}`)}`;
+            const resProxy = await fetch(proxyUrl);
+            if (resProxy.ok) {
+              const tempBlob = await resProxy.blob();
+              const sampleText = await tempBlob.slice(0, 150).text().catch(() => '');
+              if (!sampleText.includes('<!DOCTYPE') && !sampleText.includes('<html') && tempBlob.size > 20000) {
+                validBlob = new Blob([tempBlob], { type: 'audio/mpeg' });
+              }
+            }
+          } catch (e2) {
+            console.error("Proxy fetch failed:", e2);
+          }
+        }
+
+        if (validBlob) {
           const songId = 'g_' + item.id + '_' + Date.now();
           const cleanTitle = item.name.replace(/\.(mp3|mpeg)$/i, "");
           
-          await saveSongFile(songId, blob, {
+          await saveSongFile(songId, validBlob, {
             title: cleanTitle,
             artist: "Google Drive",
             cover: "./bick.jpg",
@@ -1401,35 +1432,8 @@
           
           savePlaylists();
           successCount++;
-        } catch (err) {
-          console.warn("Direct download failed, trying proxy for ID:", item.id, err);
-          try {
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${item.id}`)}`;
-            const resProxy = await fetch(proxyUrl);
-            const blobProxy = await resProxy.blob();
-            
-            const songId = 'g_' + item.id + '_' + Date.now();
-            const cleanTitle = item.name.replace(/\.(mp3|mpeg)$/i, "");
-            
-            await saveSongFile(songId, blobProxy, {
-              title: cleanTitle,
-              artist: "Google Drive",
-              cover: "./bick.jpg",
-              dateAdded: Date.now()
-            });
-
-            playlists[currentPlaylistName].push({
-              id: songId,
-              title: cleanTitle,
-              artist: "Google Drive",
-              cover: "./bick.jpg",
-              dateAdded: Date.now()
-            });
-            savePlaylists();
-            successCount++;
-          } catch (e2) {
-            console.error("Proxy fetch failed:", e2);
-          }
+        } else {
+          showToast(`⚠️ Link file "${item.name}" bị khóa hoặc chưa bật quyền Công khai (Anyone with link)`, true);
         }
       }
 
@@ -1441,8 +1445,6 @@
         renderPlaylist();
         renderTabs();
         showToast(`✅ Đã lưu ${successCount} bài hát Google Drive Offline!`);
-      } else {
-        showToast(`❌ Không thể tải nhạc từ Google Drive (Hãy kiểm tra quyền Chia Sẻ công khai file)`, true);
       }
     }
 
@@ -1508,7 +1510,8 @@
       const title = file.name.replace(/\.(mp3|mpeg)$/i, "");
       
       try {
-        await saveSongFile(id, file, { title, artist: "Local MP3", cover: "./bick.jpg", dateAdded: Date.now() });
+        const audioBlob = new Blob([file], { type: 'audio/mpeg' });
+        await saveSongFile(id, audioBlob, { title, artist: "Local MP3", cover: "./bick.jpg", dateAdded: Date.now() });
         playlists[currentPlaylistName].push({
           id, title, artist: "Local MP3", cover: "./bick.jpg", dateAdded: Date.now()
         });
@@ -1558,9 +1561,23 @@
         showToast(`❌ Không thấy file local: ${song.title}`, true);
         return;
       }
-      
+
+      // Check if stored Blob is HTML error
+      if (fileData.blob.size < 15000) {
+        const sampleText = await fileData.blob.slice(0, 150).text().catch(() => '');
+        if (sampleText.includes('<!DOCTYPE') || sampleText.includes('<html')) {
+          showToast(`⚠️ File "${song.title}" bị lỗi (Cần mở quyền công khai Google Drive)`, true);
+          return;
+        }
+      }
+
+      // Wrap in explicit audio/mpeg Blob
+      const audioBlob = new Blob([fileData.blob], { type: 'audio/mpeg' });
+
       if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-      currentBlobUrl = URL.createObjectURL(fileData.blob);
+      currentBlobUrl = URL.createObjectURL(audioBlob);
+      
+      audio.muted = false;
       audio.src = currentBlobUrl;
       audio.load();
       
@@ -1600,15 +1617,18 @@
         audio.pause();
       } else {
         try {
+          audio.muted = false;
           await audio.play();
         } catch (err) {
           console.warn("Play error, reloading Blob:", err);
           if (currentSongId) {
             const fileData = await getSongFile(currentSongId);
             if (fileData?.blob) {
+              const audioBlob = new Blob([fileData.blob], { type: 'audio/mpeg' });
               if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-              currentBlobUrl = URL.createObjectURL(fileData.blob);
+              currentBlobUrl = URL.createObjectURL(audioBlob);
               const savedTime = audio.currentTime || 0;
+              audio.muted = false;
               audio.src = currentBlobUrl;
               audio.load();
               audio.currentTime = savedTime;
@@ -1792,15 +1812,18 @@
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setActionHandler('play', async () => {
         try {
+          audio.muted = false;
           await audio.play();
         } catch (err) {
           console.warn("Lockscreen play retry:", err);
           if (currentSongId) {
             const fileData = await getSongFile(currentSongId);
             if (fileData?.blob) {
+              const audioBlob = new Blob([fileData.blob], { type: 'audio/mpeg' });
               if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-              currentBlobUrl = URL.createObjectURL(fileData.blob);
+              currentBlobUrl = URL.createObjectURL(audioBlob);
               const savedTime = audio.currentTime || 0;
+              audio.muted = false;
               audio.src = currentBlobUrl;
               audio.load();
               audio.currentTime = savedTime;
@@ -1846,6 +1869,7 @@
     async function init() {
       loadPlaylists();
       await initDB();
+      handleVolumeChange();
       renderTabs();
       renderPlaylist();
       checkIosPwa();
